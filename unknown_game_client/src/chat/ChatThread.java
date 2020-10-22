@@ -28,16 +28,16 @@ public class ChatThread extends Thread
     @Override
     public void run()
     {
-        byte[] buf = new byte[1000];
         String tmp;
         try
         {
-            for(;;)
+            while(true)
             {
+                byte[] buf = new byte[1024];
                // Handle the incoming data and print it to stnd output.
                recv = new DatagramPacket(buf, buf.length);
                msocket.receive(recv);
-               tmp = new String(recv.getData(),0,recv.getLength());
+               tmp = new String(recv.getData());
                System.out.println(tmp);
             }
         } 

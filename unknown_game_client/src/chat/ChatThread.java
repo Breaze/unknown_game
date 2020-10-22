@@ -5,6 +5,7 @@
  */
 package chat;
 
+import gui.ChatGUI;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -18,10 +19,12 @@ public class ChatThread extends Thread
 { 
     private MulticastSocket msocket;
     private DatagramPacket recv;
+    private ChatGUI gui;
 
-    public ChatThread(MulticastSocket msock ,InetAddress groupNo , int portNo)
+    public ChatThread(MulticastSocket msock ,InetAddress groupNo , int port, ChatGUI gui)
     {
         msocket = msock;
+        this.gui = gui;
         start();                // start calls run
     }
 
@@ -38,7 +41,8 @@ public class ChatThread extends Thread
                recv = new DatagramPacket(buf, buf.length);
                msocket.receive(recv);
                tmp = new String(recv.getData());
-               System.out.println(tmp);
+               //System.out.println(tmp);
+               this.gui.updateChat(tmp);
             }
         } 
         catch (IOException e) 

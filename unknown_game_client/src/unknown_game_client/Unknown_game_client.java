@@ -26,7 +26,7 @@ public class Unknown_game_client {
      */
     public static void main(String[] args) throws IOException {
         //Scanner in = new Scanner(System.in);
-        BufferedReader reader = 
+        /*BufferedReader reader = 
                    new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Ingrese su nombre");
         String name = reader.readLine();
@@ -45,7 +45,7 @@ public class Unknown_game_client {
         }while(msg!=null);
                 //chat.run();
         
-        
+        */
     }
     
 }

@@ -5,6 +5,7 @@
  */
 package chat;
 
+import gui.ChatGUI;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,22 +31,22 @@ public class Chat {
     private String message;
     private MulticastSocket socket;
     private InetAddress group;
-    public Chat(String name){
+    public Chat(String name, ChatGUI gui){
         this.port = 8888;
         this.multicastAddress = "224.1.1.5";
         this.name = name;
         this.message = null;
-        this.configureChat();
+        this.configureChat(gui);
     }
     
-    public final void configureChat(){
+    public final void configureChat(ChatGUI gui){
         try {
             this.group = InetAddress.getByName(this.multicastAddress);
             this.socket = new MulticastSocket(this.port);
             this.socket.setBroadcast(false);
             this.socket.setLoopbackMode(false);
             this.socket.joinGroup(this.group);
-            new ChatThread(this.socket,group,port);
+            new ChatThread(this.socket,group,port, gui);
             
         } catch (IOException ex) {
             Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);

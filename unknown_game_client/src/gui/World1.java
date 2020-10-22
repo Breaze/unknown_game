@@ -79,6 +79,8 @@ public class World1 extends javax.swing.JPanel {
                     create = true;
                     this.players[number-1].setName(name);
                     this.playerNumber = number;
+                    ChatGUI chatGUI = new ChatGUI(this.players[this.playerNumber-1].getName(), this.playerNumber);
+                    chatGUI.setVisible(true);
                 }else{
                     JOptionPane.showMessageDialog(this, "El jugador ya está siendo usado");
                 }
@@ -95,6 +97,16 @@ public class World1 extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenu2 = new javax.swing.JMenu();
+
+        jMenu1.setText("File");
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
 
         setPreferredSize(new java.awt.Dimension(800, 600));
         addMouseListener(new java.awt.event.MouseAdapter() {
@@ -155,5 +167,8 @@ public class World1 extends javax.swing.JPanel {
         repaint();
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
     // End of variables declaration//GEN-END:variables
 }

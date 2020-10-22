@@ -64,9 +64,9 @@ public class EnvironmentThread extends Thread{
             case "update_player_list":
                 update_player_list(data);
                 break;
-            case "update_player_position":
+            /*case "update_player_position":
                 update_player_position(data);
-                break;
+                break;*/
                 
         }
     }
@@ -78,10 +78,10 @@ public class EnvironmentThread extends Thread{
         this.world.updatePlayer(index, data[4], x, y, data[5]);
     }
     
-    public void update_player_position(String[] data){
+    /*public void update_player_position(String[] data){
         int index = Integer.parseInt(data[1]);
         int x = Integer.parseInt(data[2]);
         int y = Integer.parseInt(data[3]);
         this.world.updatePlayer(index, data[4], x, y, "Playing");
-    }
+    }*/
 }

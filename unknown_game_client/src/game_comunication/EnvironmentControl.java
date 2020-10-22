@@ -50,7 +50,7 @@ public class EnvironmentControl {
         }
     }
     
-    public boolean updatePlayerPosition(int index, int x, int y) throws UnknownHostException{
+    /*public boolean updatePlayerPosition(int index, int x, int y) throws UnknownHostException{
 
         boolean status = false;
 
@@ -76,7 +76,7 @@ public class EnvironmentControl {
             System.exit(1);
         }
         return status;
-    }
+    }*/
     
     public boolean updatePlayerList(int index, int x, int y, String name) throws UnknownHostException{
 

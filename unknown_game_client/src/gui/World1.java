@@ -5,7 +5,8 @@
  */
 package gui;
 
-import game_comunication.EnvironmentControl;
+import game_comunication.FoodControl;
+import game_comunication.PlayerControl;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
@@ -23,8 +24,12 @@ public class World1 extends javax.swing.JPanel {
 
     private ImageIcon img;
     private int playerNumber;
-    Player players[] = new Player[5];
-    private EnvironmentControl ec;
+    private Player players[] = new Player[5];
+    private PlayerControl pc;
+    private FoodControl fc;
+    private Food food[];
+    private int foodPointsNumber;
+    private boolean update;
     /**
      * Creates new form World1
      */
@@ -35,34 +40,55 @@ public class World1 extends javax.swing.JPanel {
         for(int i = 0; i < this.players.length; i++){
             this.players[i] = new Player();
         }
-        this.ec = new EnvironmentControl(this);
+        this.foodPointsNumber = 80;
+        this.createFood();
+
+        this.pc = new PlayerControl(this);
+        this.fc = new FoodControl(this);
+        this.update = true;
+        
+        
+        //ec.updatePlayerList(i, player.getX(), player.getY(), player.getName());
 
     }
 
     public void paint(Graphics g) {
-        img = new ImageIcon(getClass().getResource("/Img/world.jpg"));
-        g.drawImage(img.getImage(), 0, 0, 800, 600, null);
+        /*img = new ImageIcon(getClass().getResource("/Img/world.jpg"));
+        g.drawImage(img.getImage(), 0, 0, 800, 600, null);*/
         super.paintComponents(g);
         setOpaque(false);
 
         //g.setColor(Color.red);
         
+        for(int i = 0; i < this.food.length; i++){
+            Food point = this.food[i];
+            g.setColor(Color.green);
+            g.fillOval(point.getX(), point.getY(), point.getSize(), point.getSize());
+            
+        }
         //for(Player player:this.players){
         for(int i = 0; i < this.players.length; i++){
             Player player = this.players[i];
             if (player.getStatus().equals("Playing")) {
                 g.setColor(Color.red);
-                g.fillRect(player.getX(), player.getY(), player.getHeight(), player.getWidth());
-                try {
-                    ec.updatePlayerList(i, player.getX(), player.getY(), player.getName());
-                } catch (UnknownHostException ex) {
-                    Logger.getLogger(World1.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                g.fillOval(player.getX(), player.getY(), player.getHeight(), player.getWidth());
                 //repaint();
                 
             }
            
         }
+        for(int i = 0; i < this.players.length; i++){
+            Player player = this.players[i];
+            
+                
+                try {
+                    this.pc.updatePlayerList(i, player.getX(), player.getY(), player.getName(), player.getWidth(), player.getHeight(), player.getStatus());
+                } catch (UnknownHostException ex) {
+                    Logger.getLogger(World1.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
+        
+        
     }
     
     public void askPlayerInfo(){
@@ -108,7 +134,7 @@ public class World1 extends javax.swing.JPanel {
         jMenu2.setText("Edit");
         jMenuBar1.add(jMenu2);
 
-        setPreferredSize(new java.awt.Dimension(800, 600));
+        setPreferredSize(new java.awt.Dimension(1200, 800));
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 formMouseClicked(evt);
@@ -135,8 +161,17 @@ public class World1 extends javax.swing.JPanel {
     private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
         
         this.players[playerNumber-1].keyPressed(evt);
-        System.out.println(evt.getKeyCode());
-        repaint();
+        this.eat();
+        this.verifyColission();
+        for(int i = 0; i < this.food.length; i++){
+            Food point = this.food[i];
+            
+            try {
+                this.fc.updateFood(i, point.getX(), point.getY(), point.getSize());
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(World1.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }//GEN-LAST:event_formKeyReleased
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
@@ -154,18 +189,132 @@ public class World1 extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_formMouseClicked
 
-    public void updatePlayer(int index, String name, int x, int y, String status){
+    public void updatePlayer(int index, String name, int x, int y, String status, int width, int height){
         status = status.replace("\u0000", ""); // removes NUL chars
         status = status.replace("\\u0000", ""); // removes backslash+u0000
         if(!(index==this.playerNumber-1)){
             this.players[index].setName(name);
             this.players[index].setX(x);
             this.players[index].setY(y);
+            this.players[index].setWidth(width);
+            this.players[index].setHeight(height);
             this.players[index].setStatus(status);
         }
         
+        //repaint();
+    }
+    
+    public void kill(int index, String status){
+        status = status.replace("\u0000", ""); // removes NUL chars
+        status = status.replace("\\u0000", ""); // removes backslash+u0000
+        //if(!(index==this.playerNumber-1)){
+            this.players[index].setStatus(status);
+            this.startNewGame();
+        
+        //}
+        
+        //repaint();
+    }
+    
+    public void updateFood(int index, int x, int y, int size){
+        /*status = status.replace("\u0000", ""); // removes NUL chars
+        status = status.replace("\\u0000", ""); // removes backslash+u0000*/
+        this.food[index].setSize(size);
+        this.food[index].setX(x);
+        this.food[index].setY(y);
         repaint();
     }
+    
+    public void verifyColission(){
+        int player1X = this.players[this.playerNumber-1].getX();
+        int player1Y = this.players[this.playerNumber-1].getY();
+        int player1W = this.players[this.playerNumber-1].getWidth();
+        int player1H = this.players[this.playerNumber-1].getHeight();
+        for(int i = 0 ; i < this.players.length; i++){
+            int player2X = this.players[i].getX();
+            int player2Y = this.players[i].getY();
+            int player2W = this.players[i].getWidth();
+            int player2H = this.players[i].getHeight();
+            if(((player2X>player1X) && player2X < (player1X+player1W))&& ((player2Y>player1Y) && player2Y < (player1Y+player1H)))
+            {
+                if((player1W > player2W) && this.players[i].getStatus().equals("Playing")){
+                    //System.out.println("F Joven");
+                    //System.out.println(i);
+                    int newSize = player1W + (player2W/3);
+                    this.players[i].setStatus("Not Playing");
+                    this.players[i].setX(-1000);
+                    this.players[i].setY(-1000);
+                    this.players[this.playerNumber-1].setWidth(newSize);
+                    this.players[this.playerNumber-1].setHeight(newSize);
+                    try {
+                        Player player = this.players[i];    
+                        this.pc.kill(i, player.getStatus());
+                    } catch (UnknownHostException ex) {
+                        Logger.getLogger(World1.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    repaint();
+                    break;
+                    
+                }
+            }
+            
+            
+        }
+    }
+    
+    
+    public void eat(){
+        int player1X = this.players[this.playerNumber-1].getX();
+        int player1Y = this.players[this.playerNumber-1].getY();
+        int player1W = this.players[this.playerNumber-1].getWidth();
+        int player1H = this.players[this.playerNumber-1].getHeight();
+        for(int i = 0 ; i < this.food.length; i++){
+            int fx = this.food[i].getX();
+            int fy = this.food[i].getY();
+            int fs = this.food[i].getSize();
+            
+            if(((fx>player1X) && fx < (player1X+player1W))&& ((fy>player1Y) && fy < (player1Y+player1H)))
+            {
+                
+                    int x =  (int) (Math.random()*1000 + 1);
+                    int y =  (int) (Math.random()*700 + 1);
+                    int s = (int) (Math.random()*10 + 5);
+                    this.food[i].setSize(s);
+                    this.food[i].setX(x);
+                    this.food[i].setY(y);
+                    
+                    int newSize = player1W+(fs/3);
+                    //System.out.println(""+newSize);
+                    //System.out.println("Comio");
+                    this.players[this.playerNumber-1].setWidth(newSize);
+                    this.players[this.playerNumber-1].setHeight(newSize);
+                    break;
+                
+            }
+            
+            
+        }
+    }
+    public void createFood(){
+        this.food = new Food[this.foodPointsNumber];
+        for(int i = 0; i < this.food.length; i++){
+            Food f = new Food();
+            this.food[i] = f;
+            int x =  (int) (Math.random()*1000 + 1);
+            int y =  (int) (Math.random()*700 + 1);
+            int s = (int) (Math.random()*10 + 5);
+            this.food[i].setX(x);
+            this.food[i].setY(y);
+            this.food[i].setSize(s);
+            
+        }
+    }
+    public void startNewGame(){
+        if(this.players[this.playerNumber-1].getStatus().equals("Not Playing")){
+            this.askPlayerInfo();
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;

@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author Breaze
  */
-public class EnvironmentControl {
+public class PlayerControl {
     private String multicastAddress;
     private int port;
     private String name;
@@ -28,7 +28,7 @@ public class EnvironmentControl {
     private MulticastSocket socket;
     private InetAddress group;
     private World1 world;
-    public EnvironmentControl(World1 world){
+    public PlayerControl(World1 world){
         this.port = 8889;
         this.multicastAddress = "224.1.1.6";
         this.message = null;
@@ -43,7 +43,7 @@ public class EnvironmentControl {
             this.socket.setBroadcast(false);
             this.socket.setLoopbackMode(false);
             this.socket.joinGroup(this.group);
-            new EnvironmentThread(this.socket,this.group,this.port, this.world);
+            new PlayerThread(this.socket,this.group,this.port, this.world);
             
         } catch (IOException ex) {
             Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
@@ -78,14 +78,15 @@ public class EnvironmentControl {
         return status;
     }*/
     
-    public boolean updatePlayerList(int index, int x, int y, String name) throws UnknownHostException{
+    public boolean updatePlayerList(int index, int x, int y, String name, int width, int height, String playerStatus) throws UnknownHostException{
 
         boolean status = false;
 
         try 
         {
-            //order:index:x:y:name:status
-            String info = "update_player_list:"+index+":"+x+":"+y+":"+name+":Playing";
+            //order:index:x:y:name:status:width:height
+            String info = "update_player_list:"+index+":"+x+":"+y+":"+name+":"+playerStatus+":"+width+":"+height;
+            //System.out.println(playerStatus);
             //msg = this.name+": "+msg;
             
             if ( info==null)
@@ -106,4 +107,36 @@ public class EnvironmentControl {
         }
         return status;
     }
+    
+    public boolean kill(int index, String playerStatus) throws UnknownHostException{
+
+        boolean status = false;
+
+        try 
+        {
+            //order:index:x:y:name:status:width:height
+            String info = "kill:"+index+":"+status;
+            //System.out.println(playerStatus);
+            //msg = this.name+": "+msg;
+            
+            if ( info==null)
+                return status;
+            DatagramPacket dp = new DatagramPacket(info.getBytes(), info.length(),this.group, this.port);
+            this.socket.send(dp);
+            
+            //System.out.println("Leaving the Group...");
+            //s.leaveGroup(group);
+            //s.close();
+            status = true;
+        } 
+        catch (Exception err)
+        {
+            System.err.println("ERR: Can not join the group " + err);
+            err.printStackTrace();
+            System.exit(1);
+        }
+        return status;
+    }
+    
+    
 }

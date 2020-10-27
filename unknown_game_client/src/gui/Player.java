@@ -22,6 +22,22 @@ public class Player implements KeyListener {
     private String name;
     private int x;
     private int y;
+    private int height=50;
+    private int width=50;
+    private String status;
+
+    public Player() {
+        AWTEventMonitor.addKeyListener(this);
+        this.status ="Not Playing";
+        
+        
+        addMouseListener(new MouseAdapter() {
+
+            public void mouseClick(MouseEvent e) { // cuando se presiona el mouse
+                
+            }
+
+    });}
 
     public void setName(String name) {
         this.name = name;
@@ -39,22 +55,7 @@ public class Player implements KeyListener {
     public void setStatus(String status) {
         this.status = status;
     }
-    private int height=50;
-    private int width=100;
-    private String status;
-
-    public Player() {
-        AWTEventMonitor.addKeyListener(this);
-        this.status ="Not Playing";
-        
-        
-        addMouseListener(new MouseAdapter() {
-
-            public void mouseClick(MouseEvent e) { // cuando se presiona el mouse
-                
-            }
-
-    });}
+    
 
     public String getStatus() {
         return status;
@@ -94,23 +95,24 @@ public class Player implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent ke) {   
+        
     }
 
     @Override
     public void keyPressed(KeyEvent ke) {
         int  key= ke.getExtendedKeyCode();
         if(key== KeyEvent.VK_DOWN){
-            this.y+=5;
+            this.y+=15;
             
         }
         if(key==KeyEvent.VK_UP){
-            this.y-=5;
+            this.y-=15;
         }
         if(key==KeyEvent.VK_RIGHT){
-            this.x+=5;
+            this.x+=15;
         }
          if(key==KeyEvent.VK_LEFT){
-            this.x-=5;
+            this.x-=15;
         }
     }
 

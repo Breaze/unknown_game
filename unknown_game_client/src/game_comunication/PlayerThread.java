@@ -15,12 +15,12 @@ import java.net.MulticastSocket;
  *
  * @author Breaze
  */
-public class EnvironmentThread extends Thread{
+public class PlayerThread extends Thread{
     private MulticastSocket msocket;
     private DatagramPacket recv;
     private World1 world;
     
-    public EnvironmentThread(MulticastSocket msock ,InetAddress groupNo , int portNo, World1 world)
+    public PlayerThread(MulticastSocket msock ,InetAddress groupNo , int portNo, World1 world)
     {
         msocket = msock;
         this.world = world;
@@ -64,9 +64,10 @@ public class EnvironmentThread extends Thread{
             case "update_player_list":
                 update_player_list(data);
                 break;
-            /*case "update_player_position":
-                update_player_position(data);
-                break;*/
+            case "kill":
+                kill(data);
+                break;
+            
                 
         }
     }
@@ -75,13 +76,19 @@ public class EnvironmentThread extends Thread{
         int index = Integer.parseInt(data[1]);
         int x = Integer.parseInt(data[2]);
         int y = Integer.parseInt(data[3]);
-        this.world.updatePlayer(index, data[4], x, y, data[5]);
+        int w = Integer.parseInt(data[6]);
+        data[7] = data[7].replace("\u0000", ""); // removes NUL chars
+        data[7] = data[7].replace("\\u0000", ""); // removes backslash+u0000
+        int h = Integer.parseInt(data[7]);
+        this.world.updatePlayer(index, data[4], x, y, data[5], w, h);
     }
     
-    /*public void update_player_position(String[] data){
+    public void kill(String[] data){
         int index = Integer.parseInt(data[1]);
-        int x = Integer.parseInt(data[2]);
-        int y = Integer.parseInt(data[3]);
-        this.world.updatePlayer(index, data[4], x, y, "Playing");
-    }*/
+        data[2] = data[2].replace("\u0000", ""); // removes NUL chars
+        data[2] = data[2].replace("\\u0000", ""); // removes backslash+u0000
+        this.world.kill(index, data[2]);
+    }
+    
+    
 }
